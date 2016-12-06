@@ -62,6 +62,13 @@ def _functional_iterables():
         improve(t, "unzip", lambda self: zip(*self))
         improve(t, "index_zip", lambda self, other: zip(range(len(self)), self))
 
+def _json():
+    import json
+    JSON_ROOT_TYPES = [dict, list]
+    improve(str, "fromjson", lambda self: json.loads(self))
+    for t in JSON_ROOT_TYPES:
+        improve(t, "tojson", lambda self: json.dumps(self))
+
 def _requests():
     import requests
     class RequestsWrapper(object):
