@@ -1,4 +1,4 @@
-# <a class="spin">Imba</a>Python <sub class="blink">v0.1.0</sub><sup class="slide-left">A bit unstable</sup>
+# <a class="spin">Imba</a>Python <sub class="blink">v0.1.0</sub><sup class="slide-left" style="color: red !important;">A bit unstable</sup>
 
 <!--- Testing css in GitHub readme limits --->
 
@@ -32,7 +32,7 @@ print(
 ```
 
 
-<!--- Styles --->
+<!--- Styles
 <style>
     h1 {
         transform: rotate(2deg);
@@ -122,3 +122,4 @@ print(
         51%  {opacity: 1;}
     }
 </style>
+--->
