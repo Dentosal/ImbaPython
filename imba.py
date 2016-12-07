@@ -2,17 +2,30 @@ from forbiddenfruit import curse as improve
 import sys
 from functools import reduce, partial
 from itertools import *
-import operator
+import operator as op
 from collections import abc
 
+# import all the modules before extending types
+import requests
+import json
+
+
 # types
-ITERABLE = [tuple, list, set, str, dict, abc.Iterable, map, filter]
-SEQUENCE = [tuple, list, str, abc.Sequence]
-SIZED = ITERABLE[:]+[abc.Sized]
-NUMERIC = [int, float] # complex?
+ITERABLE = {tuple, list, set, str, dict, abc.Iterable, range, map, filter, zip}
+SEQUENCE = {tuple, list, str, abc.Sequence}
+SIZED = ITERABLE | {abc.Sized}
+NUMERIC = {int, float} # complex?
 
 def _easter_eggs():
     improve(int, "fractional", lambda self, other: float("{}.{}".format(self, other)))
+
+def _better_formatting():
+    FMT_LIKE_LIST = ITERABLE - {str}
+
+    improve(str, "fmt", lambda self, fmt: fmt.format(self))
+
+    for t in FMT_LIKE_LIST:
+        improve(t, "fmt", lambda self, fmt: list(map(lambda q: fmt.format(q), self)))
 
 def _functional_iterables():
     improve(dict, "merge", lambda self, other: {**self, **other})
@@ -25,18 +38,22 @@ def _functional_iterables():
     for t in ITERABLE:
         improve(t, "map", lambda self, f: map(f, self))
         improve(t, "filter", lambda self, f: filter(f, self))
-        improve(t, "reduce", lambda self, f, inital=None: reduce(f, self, initial))
+        improve(t, "reduce", lambda self, f: reduce(f, self))
+
+        improve(t, "join", lambda self, sep: reduce(lambda a, b: a+[sep]+b, self).reduce(op.add))
 
         improve(t, "any", lambda self, f=None: any(self) if f is None else any(map(f, self)))
         improve(t, "exists", lambda self, f=None: any(self) if f is None else any(map(f, self)))
         improve(t, "all", lambda self, f=None: all(self) if f is None else all(map(f, self)))
         improve(t, "every", lambda self, f=None: all(self) if f is None else all(map(f, self)))
 
+        improve(t, "contains", lambda self, q=None: q in self)
+
         improve(t, "min", lambda self: min(self))
         improve(t, "max", lambda self: max(self))
 
-        improve(t, "sum", lambda self: reduce(operator.add, self))
-        improve(t, "product", lambda self: reduce(operator.mul, self))
+        improve(t, "sum", lambda self: reduce(op.add, self))
+        improve(t, "product", lambda self: reduce(op.mul, self))
 
     for t in SEQUENCE:
         improve(t, "head", lambda self: self[0])
@@ -63,14 +80,12 @@ def _functional_iterables():
         improve(t, "index_zip", lambda self, other: zip(range(len(self)), self))
 
 def _json():
-    import json
     JSON_ROOT_TYPES = [dict, list]
-    improve(str, "fromjson", lambda self: json.loads(self))
+    improve(str, "json", property(lambda self: json.loads(self)))
     for t in JSON_ROOT_TYPES:
-        improve(t, "tojson", lambda self: json.dumps(self))
+        improve(t, "asjson", property(lambda self: json.dumps(self)))
 
 def _requests():
-    import requests
     class RequestsWrapper(object):
         def __init__(self, url):
             self.url = url
@@ -83,6 +98,7 @@ def _requests():
     improve(str, "fetch", property(lambda self: requests.get(self).text))
 
 DEFAULT_FEATURES = [
+    "better_formatting",
     "functional_iterables"
 ]
 EXTRA_FEATURES = [

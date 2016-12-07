@@ -18,5 +18,16 @@ imba.install("requests")
 print("http://httpbin.org/user-agent".request.get().json()["user-agent"])
 
 imba.install("json")
-print("{\"a\": [1, \"test\", 3.14]}".fromjson())
-print([1, {1: "a"}].tojson())
+print("{\"a\": [1, \"test\", 3.14]}".json)
+print([1, {1: "a"}].asjson)
+
+print(range(10).map(str).reduce(imba.op.add))
+
+print([[1, 2, 3], [4, 5, 6]].join(0))
+
+print(
+    range(1,11)
+        .map(lambda row: range(1,11)
+        .map(lambda col: row*col))
+        .map(lambda row: row.fmt("{:4}")).join("\n")
+)
